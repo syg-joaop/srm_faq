@@ -1,0 +1,81 @@
+version: '3.8'
+
+services:
+  # PostgreSQL com pgvector para armazenamento vetorial
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: srm-postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: srm_user
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-srm_secret_2024}
+      POSTGRES_DB: srm_faq
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U srm_user -d srm_faq"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - srm-network
+
+  # Ollama para IA local (embeddings + chat)
+  ollama:
+    image: ollama/ollama:latest
+    container_name: srm-ollama
+    restart: unless-stopped
+    volumes:
+      - ollama_data:/root/.ollama
+    ports:
+      - "11434:11434"
+    # Descomente se tiver GPU NVIDIA
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: all
+    #           capabilities: [gpu]
+    networks:
+      - srm-network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:11434/api/tags"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Microsserviço NestJS
+  srm-faq-api:
+    build:
+      context: ..
+      dockerfile: docker/Dockerfile
+    container_name: srm-faq-api
+    restart: unless-stopped
+    environment:
+      NODE_ENV: production
+      DATABASE_URL: postgresql://srm_user:${POSTGRES_PASSWORD:-srm_secret_2024}@postgres:5432/srm_faq
+      OLLAMA_URL: http://ollama:11434
+      EMBEDDING_MODEL: nomic-embed-text
+      CHAT_MODEL: llama3.2:3b
+      PORT: 3000
+    ports:
+      - "3000:3000"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    networks:
+      - srm-network
+
+volumes:
+  postgres_data:
+  ollama_data:
+
+networks:
+  srm-network:
+    driver: bridge

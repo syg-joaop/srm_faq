@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SRM FAQ Admin</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0a0a0b;
+      --bg-secondary: #141416;
+      --bg-tertiary: #1c1c1f;
+      --accent: #6366f1;
+      --accent-hover: #818cf8;
+      --success: #10b981;
+      --warning: #f59e0b;
+      --danger: #ef4444;
+      --text-primary: #fafafa;
+      --text-secondary: #a1a1aa;
+      --text-muted: #71717a;
+      --border: #27272a;
+      --border-light: #3f3f46;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg-primary);
+      color: var(--text-primary);
+      min-height: 100vh;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    .header {
+      background: var(--bg-secondary);
+      border-bottom: 1px solid var(--border);
+      padding: 1rem 2rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .header-content {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 700;
+      font-size: 1.25rem;
+    }
+
+    .logo-icon {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+    }
+
+    .nav-tabs {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .nav-tab {
+      padding: 0.5rem 1rem;
+      background: transparent;
+      border: none;
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 500;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: all 0.2s;
+    }
+
+    .nav-tab:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .nav-tab.active {
+      background: var(--accent);
+      color: white;
+    }
+
+    /* Main Content */
+    .main {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Stats Grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+
+    .stat-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .stat-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 0.5rem;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, var(--accent), #a855f7);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Panels */
+    .panel {
+      display: none;
+    }
+
+    .panel.active {
+      display: block;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      overflow: hidden;
+      margin-bottom: 1.5rem;
+    }
+
+    .card-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .card-body {
+      padding: 1.5rem;
+    }
+
+    /* Form Elements */
+    .form-group {
+      margin-bottom: 1.25rem;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      margin-bottom: 0.5rem;
+    }
+
+    .form-input,
+    .form-textarea,
+    .form-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus,
+    .form-textarea:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.75rem 1.5rem;
+      font-family: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: var(--accent);
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      transform: translateY(-1px);
+    }
+
+    .btn-secondary {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover {
+      background: var(--border);
+    }
+
+    .btn-danger {
+      background: transparent;
+      color: var(--danger);
+      border: 1px solid var(--danger);
+    }
+
+    .btn-danger:hover {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-sm {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.8rem;
+    }
+
+    /* Table */
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 1rem;
+      text-align: left;
+    }
+
+    th {
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 1px solid var(--border);
+    }
+
+    td {
+      border-bottom: 1px solid var(--border);
+      font-size: 0.9rem;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover {
+      background: var(--bg-tertiary);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.75rem;
+      font-weight: 500;
+      border-radius: 50px;
+      background: var(--bg-tertiary);
+      color: var(--text-secondary);
+    }
+
+    .badge-success {
+      background: rgba(16, 185, 129, 0.1);
+      color: var(--success);
+    }
+
+    .badge-warning {
+      background: rgba(245, 158, 11, 0.1);
+      color: var(--warning);
+    }
+
+    .actions {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    /* Chat Panel */
+    .chat-container {
+      display: grid;
+      grid-template-columns: 1fr 350px;
+      gap: 1.5rem;
+      height: calc(100vh - 200px);
+      min-height: 500px;
+    }
+
+    .chat-main {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .chat-messages {
+      flex: 1;
+      padding: 1.5rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .message {
+      max-width: 80%;
+      padding: 1rem 1.25rem;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    .message-user {
+      align-self: flex-end;
+      background: var(--accent);
+      color: white;
+      border-bottom-right-radius: 4px;
+    }
+
+    .message-bot {
+      align-self: flex-start;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-bottom-left-radius: 4px;
+    }
+
+    .chat-input-container {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      gap: 0.75rem;
+    }
+
+    .chat-input {
+      flex: 1;
+      padding: 0.875rem 1rem;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      color: var(--text-primary);
+      font-family: inherit;
+      font-size: 0.95rem;
+    }
+
+    .chat-input:focus {
+      outline: none;
+      border-color: var(--accent);
+    }
+
+    .chat-sidebar {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 1.5rem;
+    }
+
+    .sidebar-title {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .source-card {
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem;
+      margin-bottom: 0.75rem;
+    }
+
+    .source-question {
+      font-size: 0.9rem;
+      font-weight: 500;
+      margin-bottom: 0.5rem;
+    }
+
+    .source-similarity {
+      font-size: 0.75rem;
+      color: var(--success);
+    }
+
+    /* Toast */
+    .toast-container {
+      position: fixed;
+      bottom: 2rem;
+      right: 2rem;
+      z-index: 1000;
+    }
+
+    .toast {
+      padding: 1rem 1.5rem;
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      animation: slideIn 0.3s ease;
+    }
+
+    .toast-success {
+      border-left: 3px solid var(--success);
+    }
+
+    .toast-error {
+      border-left: 3px solid var(--danger);
+    }
+
+    @keyframes slideIn {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+
+    /* Loading */
+    .loading {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 3rem;
+    }
+
+    .spinner {
+      width: 40px;
+      height: 40px;
+      border: 3px solid var(--border);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 4rem 2rem;
+      color: var(--text-muted);
+    }
+
+    .empty-state-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+      opacity: 0.5;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.2s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .modal {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      transform: scale(0.95);
+      transition: transform 0.2s;
+    }
+
+    .modal-overlay.active .modal {
+      transform: scale(1);
+    }
+
+    .modal-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      background: transparent;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-close:hover {
+      background: var(--bg-tertiary);
+      color: var(--text-primary);
+    }
+
+    .modal-body {
+      padding: 1.5rem;
+    }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .header-content {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+
+      .chat-container {
+        grid-template-columns: 1fr;
+      }
+
+      .chat-sidebar {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <div class="logo">
+        <div class="logo-icon">📚</div>
+        <span>SRM FAQ Admin</span>
+      </div>
+      <nav class="nav-tabs">
+        <button class="nav-tab active" data-panel="dashboard">Dashboard</button>
+        <button class="nav-tab" data-panel="faqs">FAQs</button>
+        <button class="nav-tab" data-panel="chat">Testar Chat</button>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main">
+    <!-- Dashboard Panel -->
+    <div id="dashboard" class="panel active">
+      <div class="stats-grid" id="stats-grid">
+        <div class="stat-card">
+          <div class="stat-label">Total de FAQs</div>
+          <div class="stat-value" id="stat-total">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">FAQs Ativas</div>
+          <div class="stat-value" id="stat-active">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Conversas</div>
+          <div class="stat-value" id="stat-conversations">-</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Categorias</div>
+          <div class="stat-value" id="stat-categories">-</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Adicionar Nova FAQ</h2>
+        </div>
+        <div class="card-body">
+          <form id="faq-form">
+            <div class="form-group">
+              <label class="form-label">Pergunta *</label>
+              <input type="text" class="form-input" id="faq-question" placeholder="Ex: Como faço para redefinir minha senha?" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Resposta *</label>
+              <textarea class="form-textarea" id="faq-answer" placeholder="Digite a resposta completa para esta pergunta..." required></textarea>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Categoria</label>
+                <input type="text" class="form-input" id="faq-category" placeholder="Ex: Conta, Pagamento, Suporte">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Tags (separadas por vírgula)</label>
+                <input type="text" class="form-input" id="faq-tags" placeholder="Ex: senha, login, acesso">
+              </div>
+            </div>
+            <button type="submit" class="btn btn-primary">
+              ✨ Salvar FAQ
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQs Panel -->
+    <div id="faqs" class="panel">
+      <div class="card">
+        <div class="card-header">
+          <h2 class="card-title">Todas as FAQs</h2>
+          <button class="btn btn-secondary btn-sm" onclick="loadFaqs()">🔄 Atualizar</button>
+        </div>
+        <div class="table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th>ID</th>
+                <th>Pergunta</th>
+                <th>Categoria</th>
+                <th>Status</th>
+                <th>Ações</th>
+              </tr>
+            </thead>
+            <tbody id="faqs-table-body">
+              <tr>
+                <td colspan="5">
+                  <div class="loading"><div class="spinner"></div></div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chat Panel -->
+    <div id="chat" class="panel">
+      <div class="chat-container">
+        <div class="chat-main">
+          <div class="chat-messages" id="chat-messages">
+            <div class="message message-bot">
+              Olá! 👋 Sou o assistente do SRM. Como posso ajudar você hoje?
+            </div>
+          </div>
+          <div class="chat-input-container">
+            <input type="text" class="chat-input" id="chat-input" placeholder="Digite sua pergunta..." onkeypress="handleChatKeypress(event)">
+            <button class="btn btn-primary" onclick="sendChatMessage()">Enviar</button>
+          </div>
+        </div>
+        <div class="chat-sidebar">
+          <div class="sidebar-title">Fontes Encontradas</div>
+          <div id="chat-sources">
+            <div class="empty-state">
+              <p>As fontes aparecerão aqui após você enviar uma pergunta.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Edit Modal -->
+  <div class="modal-overlay" id="edit-modal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3 class="modal-title">Editar FAQ</h3>
+        <button class="modal-close" onclick="closeModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="edit-form">
+          <input type="hidden" id="edit-id">
+          <div class="form-group">
+            <label class="form-label">Pergunta</label>
+            <input type="text" class="form-input" id="edit-question" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Resposta</label>
+            <textarea class="form-textarea" id="edit-answer" required></textarea>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Categoria</label>
+              <input type="text" class="form-input" id="edit-category">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Tags</label>
+              <input type="text" class="form-input" id="edit-tags">
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" onclick="closeModal()">Cancelar</button>
+        <button class="btn btn-primary" onclick="saveEdit()">Salvar Alterações</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <script>
+    const API_BASE = '/api/faq';
+    let currentSessionId = null;
+
+    // Navigation
+    document.querySelectorAll('.nav-tab').forEach(tab => {
+      tab.addEventListener('click', () => {
+        document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        
+        tab.classList.add('active');
+        document.getElementById(tab.dataset.panel).classList.add('active');
+        
+        if (tab.dataset.panel === 'faqs') loadFaqs();
+        if (tab.dataset.panel === 'dashboard') loadStats();
+      });
+    });
+
+    // Toast Notifications
+    function showToast(message, type = 'success') {
+      const container = document.getElementById('toast-container');
+      const toast = document.createElement('div');
+      toast.className = `toast toast-${type}`;
+      toast.innerHTML = `
+        <span>${type === 'success' ? '✅' : '❌'}</span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      setTimeout(() => toast.remove(), 3000);
+    }
+
+    // Load Stats
+    async function loadStats() {
+      try {
+        const response = await fetch(`${API_BASE}/stats`);
+        const result = await response.json();
+        if (result.success) {
+          document.getElementById('stat-total').textContent = result.data.totalFaqs;
+          document.getElementById('stat-active').textContent = result.data.activeFaqs;
+          document.getElementById('stat-conversations').textContent = result.data.totalConversations;
+          document.getElementById('stat-categories').textContent = result.data.categories;
+        }
+      } catch (error) {
+        console.error('Erro ao carregar stats:', error);
+      }
+    }
+
+    // Load FAQs
+    async function loadFaqs() {
+      const tbody = document.getElementById('faqs-table-body');
+      tbody.innerHTML = '<tr><td colspan="5"><div class="loading"><div class="spinner"></div></div></td></tr>';
+      
+      try {
+        const response = await fetch(`${API_BASE}?includeInactive=true`);
+        const result = await response.json();
+        
+        if (result.success && result.data.length > 0) {
+          tbody.innerHTML = result.data.map(faq => `
+            <tr>
+              <td>#${faq.id}</td>
+              <td>${escapeHtml(faq.question.substring(0, 60))}${faq.question.length > 60 ? '...' : ''}</td>
+              <td><span class="badge">${faq.category || 'Sem categoria'}</span></td>
+              <td><span class="badge ${faq.is_active ? 'badge-success' : 'badge-warning'}">${faq.is_active ? 'Ativa' : 'Inativa'}</span></td>
+              <td class="actions">
+                <button class="btn btn-secondary btn-sm" onclick="editFaq(${faq.id})">✏️</button>
+                <button class="btn btn-danger btn-sm" onclick="deleteFaq(${faq.id})">🗑️</button>
+              </td>
+            </tr>
+          `).join('');
+        } else {
+          tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state"><div class="empty-state-icon">📭</div><p>Nenhuma FAQ cadastrada ainda</p></div></td></tr>';
+        }
+      } catch (error) {
+        tbody.innerHTML = '<tr><td colspan="5"><div class="empty-state">Erro ao carregar FAQs</div></td></tr>';
+        showToast('Erro ao carregar FAQs', 'error');
+      }
+    }
+
+    // Create FAQ
+    document.getElementById('faq-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const data = {
+        question: document.getElementById('faq-question').value,
+        answer: document.getElementById('faq-answer').value,
+        category: document.getElementById('faq-category').value || null,
+        tags: document.getElementById('faq-tags').value 
+          ? document.getElementById('faq-tags').value.split(',').map(t => t.trim())
+          : null
+      };
+      
+      try {
+        const response = await fetch(API_BASE, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('FAQ criada com sucesso!');
+          e.target.reset();
+          loadStats();
+        } else {
+          showToast(result.message || 'Erro ao criar FAQ', 'error');
+        }
+      } catch (error) {
+        showToast('Erro ao criar FAQ', 'error');
+      }
+    });
+
+    // Edit FAQ
+    async function editFaq(id) {
+      try {
+        const response = await fetch(`${API_BASE}/${id}`);
+        const result = await response.json();
+        
+        if (result.success) {
+          const faq = result.data;
+          document.getElementById('edit-id').value = faq.id;
+          document.getElementById('edit-question').value = faq.question;
+          document.getElementById('edit-answer').value = faq.answer;
+          document.getElementById('edit-category').value = faq.category || '';
+          document.getElementById('edit-tags').value = faq.tags ? faq.tags.join(', ') : '';
+          document.getElementById('edit-modal').classList.add('active');
+        }
+      } catch (error) {
+        showToast('Erro ao carregar FAQ', 'error');
+      }
+    }
+
+    async function saveEdit() {
+      const id = document.getElementById('edit-id').value;
+      const data = {
+        question: document.getElementById('edit-question').value,
+        answer: document.getElementById('edit-answer').value,
+        category: document.getElementById('edit-category').value || null,
+        tags: document.getElementById('edit-tags').value 
+          ? document.getElementById('edit-tags').value.split(',').map(t => t.trim())
+          : null
+      };
+      
+      try {
+        const response = await fetch(`${API_BASE}/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('FAQ atualizada com sucesso!');
+          closeModal();
+          loadFaqs();
+        } else {
+          showToast(result.message || 'Erro ao atualizar FAQ', 'error');
+        }
+      } catch (error) {
+        showToast('Erro ao atualizar FAQ', 'error');
+      }
+    }
+
+    // Delete FAQ
+    async function deleteFaq(id) {
+      if (!confirm('Tem certeza que deseja excluir esta FAQ?')) return;
+      
+      try {
+        const response = await fetch(`${API_BASE}/${id}`, { method: 'DELETE' });
+        const result = await response.json();
+        
+        if (result.success) {
+          showToast('FAQ excluída com sucesso!');
+          loadFaqs();
+          loadStats();
+        } else {
+          showToast(result.message || 'Erro ao excluir FAQ', 'error');
+        }
+      } catch (error) {
+        showToast('Erro ao excluir FAQ', 'error');
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('edit-modal').classList.remove('active');
+    }
+
+    // Chat
+    function handleChatKeypress(event) {
+      if (event.key === 'Enter') sendChatMessage();
+    }
+
+    async function sendChatMessage() {
+      const input = document.getElementById('chat-input');
+      const message = input.value.trim();
+      if (!message) return;
+      
+      const messagesContainer = document.getElementById('chat-messages');
+      
+      // Add user message
+      messagesContainer.innerHTML += `<div class="message message-user">${escapeHtml(message)}</div>`;
+      input.value = '';
+      
+      // Add loading
+      const loadingId = 'loading-' + Date.now();
+      messagesContainer.innerHTML += `<div id="${loadingId}" class="message message-bot">⏳ Pensando...</div>`;
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+      
+      try {
+        const response = await fetch(`${API_BASE}/chat`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message, sessionId: currentSessionId })
+        });
+        
+        const result = await response.json();
+        document.getElementById(loadingId).remove();
+        
+        if (result.success) {
+          currentSessionId = result.data.sessionId;
+          messagesContainer.innerHTML += `<div class="message message-bot">${escapeHtml(result.data.answer)}</div>`;
+          
+          // Update sources
+          const sourcesContainer = document.getElementById('chat-sources');
+          if (result.data.sources && result.data.sources.length > 0) {
+            sourcesContainer.innerHTML = result.data.sources.map(source => `
+              <div class="source-card">
+                <div class="source-question">${escapeHtml(source.question)}</div>
+                <div class="source-similarity">Similaridade: ${(source.similarity * 100).toFixed(1)}%</div>
+              </div>
+            `).join('');
+          } else {
+            sourcesContainer.innerHTML = '<div class="empty-state"><p>Nenhuma fonte encontrada</p></div>';
+          }
+        } else {
+          messagesContainer.innerHTML += `<div class="message message-bot">Desculpe, ocorreu um erro. Tente novamente.</div>`;
+        }
+      } catch (error) {
+        document.getElementById(loadingId).remove();
+        messagesContainer.innerHTML += `<div class="message message-bot">Erro de conexão. Verifique sua internet.</div>`;
+      }
+      
+      messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Initial load
+    loadStats();
+  </script>
+</body>
+</html>
