@@ -37,6 +37,6 @@ RUN chown -R nestjs:nodejs /app
 
 USER nestjs
 
-EXPOSE 3000
+EXPOSE 3028
 
 CMD ["node", "dist/main.js"]
