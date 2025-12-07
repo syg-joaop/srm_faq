@@ -34,7 +34,7 @@ REGRAS:
             { role: 'system', content: systemPrompt },
             { role: 'user', content: `Pergunta: "${userMessage}"\n\nInformação para usar: "${content}"\n\nResponda:` },
           ],
-          temperature: 0.7,
+          temperature: 0.3,
           max_tokens: 200,
         }),
       });
