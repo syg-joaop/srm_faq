@@ -116,7 +116,7 @@ export class FaqService {
 
   async search(
     query: string,
-    threshold = 0.5,
+    threshold = 0.3,
     limit = 5,
   ): Promise<SearchResult[]> {
     // Gerar embedding da query
@@ -135,8 +135,8 @@ export class FaqService {
   async chat(message: string, sessionId?: string): Promise<ChatResponse> {
     const resolvedSessionId = sessionId || uuidv4();
 
-    // Buscar FAQs relevantes
-    const searchResults = await this.search(message, 0.5, 3);
+    // Buscar FAQs relevantes (threshold mais baixo para encontrar mais resultados)
+    const searchResults = await this.search(message, 0.3, 3);
 
     let answer: string;
 
@@ -145,12 +145,17 @@ export class FaqService {
                'Você poderia reformular sua dúvida ou entrar em contato com nosso suporte ' +
                'para uma assistência mais personalizada?';
     } else {
-      // Usar a melhor resposta encontrada
+      // Retornar a resposta da FAQ diretamente (sem humanização)
       const bestMatch = searchResults[0];
-      answer = await this.ollamaService.humanizeResponse(
-        bestMatch.answer,
-        message,
-      );
+      const similarity = Math.round(bestMatch.similarity * 100);
+      
+      // Formatar resposta amigável sem usar LLM
+      answer = `Olá! Encontrei essa informação para você:\n\n${bestMatch.answer}`;
+      
+      // Se tiver mais resultados relevantes, mencionar
+      if (searchResults.length > 1 && searchResults[1].similarity > 0.5) {
+        answer += `\n\nPosso ajudar com mais alguma dúvida?`;
+      }
     }
 
     // Logar a conversa
