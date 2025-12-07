@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService } from './database.service';
 import { OllamaService } from './ollama.service';
+import { GroqService } from './groq.service';
 import {
   CreateFaqDto,
   UpdateFaqDto,
@@ -15,6 +16,7 @@ export class FaqService {
   constructor(
     private databaseService: DatabaseService,
     private ollamaService: OllamaService,
+    private groqService: GroqService,
   ) {}
 
   async create(dto: CreateFaqDto): Promise<FaqEntity> {
@@ -54,11 +56,8 @@ export class FaqService {
     const existing = await this.findOne(id);
     if (!existing) return null;
 
-    // Se pergunta ou resposta mudou, regerar embedding
-    let embeddingUpdate = '';
     const params: any[] = [];
     let paramIndex = 1;
-
     const updates: string[] = [];
 
     if (dto.question !== undefined) {
@@ -119,11 +118,11 @@ export class FaqService {
     threshold = 0.3,
     limit = 5,
   ): Promise<SearchResult[]> {
-    // Gerar embedding da query
+    // Gerar embedding da query usando Ollama
     const queryEmbedding = await this.ollamaService.generateEmbedding(query);
     const embeddingStr = `[${queryEmbedding.join(',')}]`;
 
-    // Buscar FAQs similares usando a função do banco
+    // Buscar FAQs similares
     const results = await this.databaseService.query<SearchResult>(
       `SELECT * FROM search_similar_faqs($1::vector, $2, $3)`,
       [embeddingStr, threshold, limit],
@@ -135,7 +134,7 @@ export class FaqService {
   async chat(message: string, sessionId?: string): Promise<ChatResponse> {
     const resolvedSessionId = sessionId || uuidv4();
 
-    // Buscar FAQs relevantes (threshold mais baixo para encontrar mais resultados)
+    // Buscar FAQs relevantes
     const searchResults = await this.search(message, 0.3, 3);
 
     let answer: string;
@@ -145,17 +144,12 @@ export class FaqService {
                'Você poderia reformular sua dúvida ou entrar em contato com nosso suporte ' +
                'para uma assistência mais personalizada?';
     } else {
-      // Retornar a resposta da FAQ diretamente (sem humanização)
+      // Usar Groq para humanizar a resposta (super rápido!)
       const bestMatch = searchResults[0];
-      const similarity = Math.round(bestMatch.similarity * 100);
-      
-      // Formatar resposta amigável sem usar LLM
-      answer = `Olá! Encontrei essa informação para você:\n\n${bestMatch.answer}`;
-      
-      // Se tiver mais resultados relevantes, mencionar
-      if (searchResults.length > 1 && searchResults[1].similarity > 0.5) {
-        answer += `\n\nPosso ajudar com mais alguma dúvida?`;
-      }
+      answer = await this.groqService.humanizeResponse(
+        bestMatch.answer,
+        message,
+      );
     }
 
     // Logar a conversa

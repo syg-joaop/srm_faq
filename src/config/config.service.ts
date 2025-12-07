@@ -14,8 +14,8 @@ export class ConfigService {
     return process.env.EMBEDDING_MODEL || 'nomic-embed-text';
   }
 
-  get chatModel(): string {
-    return process.env.CHAT_MODEL || 'llama3.2:3b';
+  get groqApiKey(): string {
+    return process.env.GROQ_API_KEY || '';
   }
 
   get embeddingDimensions(): number {
