@@ -71,7 +71,7 @@ export class KnowledgeController {
   @Post('chat')
   async chat(@Body() dto: ChatDto) {
     try {
-      const response = await this.service.chat(dto.message, dto.sessionId, dto.humanize);
+      const response = await this.service.chat(dto.message, dto.sessionId);
       return { success: true, data: response };
     } catch (error) {
       throw new HttpException({ success: false, message: error.message }, HttpStatus.INTERNAL_SERVER_ERROR);

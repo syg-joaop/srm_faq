@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 import { DatabaseService } from './database.service';
 import { EmbeddingService } from './embedding.service';
 import { GroqService } from './groq.service';
-import { ConfigService } from '../config/config.service';
 import { CreateKnowledgeDto, UpdateKnowledgeDto, KnowledgeEntity, SearchResult } from './knowledge.dto';
 
 @Injectable()
@@ -12,45 +11,21 @@ export class KnowledgeService {
     private db: DatabaseService,
     private embedding: EmbeddingService,
     private groq: GroqService,
-    private config: ConfigService,
   ) {}
 
   async create(dto: CreateKnowledgeDto): Promise<KnowledgeEntity> {
-    // Gerar título automaticamente se não fornecido
-    const title = dto.title || this.generateTitle(dto.content);
-
     // Gerar embedding do conteúdo
-    const vector = await this.embedding.generate(`${title} ${dto.content}`);
+    const vector = await this.embedding.generate(`${dto.title} ${dto.content}`);
     const vectorStr = `[${vector.join(',')}]`;
 
     const result = await this.db.queryOne<KnowledgeEntity>(
       `INSERT INTO knowledge_base (title, content, category, tags, embedding)
        VALUES ($1, $2, $3, $4, $5::vector)
        RETURNING id, title, content, category, tags, is_active, created_at, updated_at`,
-      [title, dto.content, dto.category || null, dto.tags || null, vectorStr],
+      [dto.title, dto.content, dto.category || null, dto.tags || null, vectorStr],
     );
 
     return result!;
-  }
-
-  private generateTitle(content: string): string {
-    // Pegar as primeiras palavras significativas do conteúdo
-    const cleaned = content
-      .replace(/[#*_\-]/g, '') // Remove markdown
-      .replace(/\s+/g, ' ') // Normaliza espaços
-      .trim();
-
-    // Pegar primeira frase ou primeiras 50 caracteres
-    const firstSentence = cleaned.split(/[.!?\n]/)[0].trim();
-
-    if (firstSentence.length <= 60) {
-      return firstSentence;
-    }
-
-    // Cortar na última palavra completa antes de 60 caracteres
-    const truncated = firstSentence.substring(0, 60);
-    const lastSpace = truncated.lastIndexOf(' ');
-    return (lastSpace > 30 ? truncated.substring(0, lastSpace) : truncated) + '...';
   }
 
   async findAll(includeInactive = false): Promise<KnowledgeEntity[]> {
@@ -119,17 +94,9 @@ export class KnowledgeService {
     );
   }
 
-  /**
-   * @param message - Mensagem do usuário
-   * @param sessionId - ID da sessão (opcional)
-   * @param humanize - Se deve usar LLM para humanizar (undefined = usa config ENV)
-   */
-  async chat(message: string, sessionId?: string, humanize?: boolean) {
+  async chat(message: string, sessionId?: string) {
     const sid = sessionId || uuidv4();
-
-    // Determina se deve humanizar: parâmetro > ENV > default true
-    const shouldHumanize = humanize !== undefined ? humanize : this.config.useGroqHumanize;
-
+    
     // Buscar conhecimento relevante
     const results = await this.search(message, 0.6);
     const hasMatch = results.length > 0 && results[0].similarity >= 0.6;
@@ -137,18 +104,15 @@ export class KnowledgeService {
     let answer: string;
 
     if (!hasMatch) {
-      answer = 'Sou o assistente do SRM e posso ajudar apenas com dúvidas sobre o sistema.\n\n' +
+      answer = 'Olá! Sou o assistente do SRM e posso ajudar apenas com dúvidas sobre o sistema.\n\n' +
                'Exemplos do que posso responder:\n' +
-               '- Como redefinir senha\n' +
-               '- Formas de pagamento\n' +
-               '- Funcionalidades do sistema\n\n' +
+               '• Como redefinir senha\n' +
+               '• Formas de pagamento\n' +
+               '• Funcionalidades do sistema\n\n' +
                'Como posso ajudar?';
-    } else if (shouldHumanize) {
+    } else {
       // Humanizar resposta via Groq
       answer = await this.groq.humanize(results[0].content, message);
-    } else {
-      // Retorna resposta direta do banco (embedding match)
-      answer = results[0].content;
     }
 
     // Logar
@@ -158,7 +122,7 @@ export class KnowledgeService {
       [sid, message, results[0]?.id || null, answer, results[0]?.similarity || 0],
     );
 
-    return { answer, sources: hasMatch ? results : [], sessionId: sid, humanized: shouldHumanize };
+    return { answer, sources: hasMatch ? results : [], sessionId: sid };
   }
 
   async getStats() {

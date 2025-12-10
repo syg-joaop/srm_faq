@@ -13,15 +13,4 @@ export class ConfigService {
   get groqApiKey(): string {
     return process.env.GROQ_API_KEY || '';
   }
-
-  /**
-   * Se true, usa GROQ para humanizar respostas por padrão.
-   * Se false, retorna apenas a resposta do banco (embedding match) sem LLM.
-   * Pode ser sobrescrito por request via parâmetro `humanize`.
-   */
-  get useGroqHumanize(): boolean {
-    const value = process.env.USE_GROQ_HUMANIZE;
-    if (value === undefined || value === '') return true; // Default: true
-    return value.toLowerCase() === 'true' || value === '1';
-  }
 }
