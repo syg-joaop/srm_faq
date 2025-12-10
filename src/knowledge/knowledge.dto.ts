@@ -1,9 +1,10 @@
 import { IsString, IsOptional, IsArray, IsBoolean } from 'class-validator';
 
-// Cadastrar apenas título + conteúdo (resposta)
+// Cadastrar conteúdo (título é gerado automaticamente se não fornecido)
 export class CreateKnowledgeDto {
+  @IsOptional()
   @IsString()
-  title: string;
+  title?: string;
 
   @IsString()
   content: string;
@@ -48,6 +49,10 @@ export class ChatDto {
   @IsOptional()
   @IsString()
   sessionId?: string;
+
+  @IsOptional()
+  @IsBoolean()
+  humanize?: boolean;
 }
 
 export interface KnowledgeEntity {
