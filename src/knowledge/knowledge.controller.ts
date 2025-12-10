@@ -58,10 +58,9 @@ export class KnowledgeController {
     return { success: true };
   }
 
-  @Post('search')
   async search(@Body() body: { query: string; threshold?: number }) {
     try {
-      const results = await this.service.search(body.query, body.threshold ?? 0.6);
+      const results = await this.service.search(body.query, body.threshold ?? 0.35);
       return { success: true, data: results };
     } catch (error) {
       throw new HttpException({ success: false, message: error.message }, HttpStatus.INTERNAL_SERVER_ERROR);

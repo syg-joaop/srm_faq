@@ -21,7 +21,7 @@ USING hnsw (embedding vector_cosine_ops);
 -- Função de busca
 CREATE OR REPLACE FUNCTION search_knowledge(
     query_embedding vector(768),
-    match_threshold FLOAT DEFAULT 0.6,
+    match_threshold FLOAT DEFAULT 0.35,
     match_count INT DEFAULT 5
 )
 RETURNS TABLE (
