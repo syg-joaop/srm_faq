@@ -5,7 +5,7 @@ Sistema de FAQ com busca semântica vetorizada e respostas humanizadas por IA.
 ## Arquitetura
 
 - **PostgreSQL + pgvector** - Armazenamento vetorial
-- **Ollama** - Embeddings (nomic-embed-text)
+- **Ollama** - Embeddings ()
 - **Groq** - Humanização de respostas (llama-3.3-70b)
 - **NestJS** - API REST
 
