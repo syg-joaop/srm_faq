@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS knowledge_base (
     content TEXT NOT NULL,
     category VARCHAR(100),
     tags TEXT[],
-    embedding vector(768),
+    embedding vector(1024),
     is_active BOOLEAN DEFAULT true,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
@@ -20,7 +20,7 @@ USING hnsw (embedding vector_cosine_ops);
 
 -- Função de busca
 CREATE OR REPLACE FUNCTION search_knowledge(
-    query_embedding vector(768),
+    query_embedding vector(1024),
     match_threshold FLOAT DEFAULT 0.35,
     match_count INT DEFAULT 5
 )

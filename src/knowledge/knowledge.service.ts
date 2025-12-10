@@ -109,7 +109,7 @@ export class KnowledgeService {
     return result.length > 0;
   }
 
-  async search(query: string, threshold = 0.35): Promise<SearchResult[]> {
+  async search(query: string, threshold = 0.75): Promise<SearchResult[]> {
     const vector = await this.embedding.generate(query);
     const vectorStr = `[${vector.join(',')}]`;
 
@@ -131,8 +131,8 @@ export class KnowledgeService {
     const shouldHumanize = humanize !== undefined ? humanize : this.config.useGroqHumanize;
 
     // Buscar conhecimento relevante (threshold baixo para melhor recall)
-    const results = await this.search(message, 0.35);
-    const hasMatch = results.length > 0 && results[0].similarity >= 0.35;
+    const results = await this.search(message, 0.75);
+    const hasMatch = results.length > 0 && results[0].similarity >= 0.75;
 
     let answer: string;
 

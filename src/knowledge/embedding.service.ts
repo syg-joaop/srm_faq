@@ -31,7 +31,7 @@ export class EmbeddingService implements OnModuleInit {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: 'nomic-embed-text',
+        model: 'bge-m3',
         prompt: text,
       }),
     });
